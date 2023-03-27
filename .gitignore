@@ -1,1 +1,65 @@
 .azure
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+**/.vscode
+
+### Local Dev ###
+.DS_Store
+**/.DS_Store
+
+.env
+.whitesource
+*.conf
+*.jar
+
+order-service/flyway.conf
+makeline-service/.fleet/
+
+outputs/
+config.json
+start.sh
+./scripts/config.json
+ancillary/local-gateway/.mvn/wrapper/
+
+ancillary/local-gateway/mvnw
+
+*.cmd
+
+nn-bindings/reddog-sandbox
+
+prv/*
+deploy/*
+cnf/*
+dist/*
