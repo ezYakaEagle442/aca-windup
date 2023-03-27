@@ -3,11 +3,15 @@ param location string = resourceGroup().location
 param tags object = {}
 
 param containerAppsEnvironmentName string = ''
+param windupInput string = 'spring-petclinic-3.0.0-SNAPSHOT.jar'
+param windupTarget string = 'azure-appservice'
+
 param containerName string = 'windup-cli'
 param containerRegistryName string = ''
 param env array = []
 param external bool = true
 param imageName string = 'quay.io/windupeng/windup-cli-openshift:latest'
+param windupBinaryPath string = '/opt/migrationtoolkit/bin/windup-cli'
 param managedIdentity bool = true
 param targetPort int = 8080
 
@@ -83,7 +87,7 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
       containers: [
         {
           command: [
-            '/opt/migrationtoolkit/bin/windup-cli', '--input /winshare/input/spring-petclinic-3.0.0-SNAPSHOT.jar', '--target azure-appservice', ' --output /winshare/output/', '-b'            
+            '${windupBinaryPath}', '--input /winshare/input/${windupInput}', '--target ${windupTarget}', ' --output /winshare/output/', '-b'            
           ]          
           image: imageName
           name: containerName
