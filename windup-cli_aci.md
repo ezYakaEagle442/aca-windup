@@ -1,4 +1,6 @@
 
+Read the [docs](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-volume-azure-files)
+[https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics)
 
 ```sh
 
@@ -9,7 +11,7 @@ tenantId=$(az account show --query tenantId -o tsv)
 UNIQUEID=$(openssl rand -hex 3)
 rg_name="rg-aca-windup"
 location="westeurope"
-appName="Windup$UNIQUEID"
+appName="windup$UNIQUEID"
 echo "appName=$appName"
 
 # Create an Azure File
@@ -41,7 +43,7 @@ windupBinaryPath="/opt/migrationtoolkit/bin/windup-cli"
 windupInput="spring-petclinic-3.0.0-SNAPSHOT.jar"
 windupTarget="azure-appservice"
 
-analytics_workspace_name="law-${appName}"
+analytics_workspace_name="law${appName}"
 echo "Analytics Workspace Name :" $analytics_workspace_name
 
 az monitor log-analytics workspace create -n $analytics_workspace_name --location $location -g $rg_name --verbose
@@ -56,24 +58,34 @@ customerId=$(az monitor log-analytics workspace show -n $analytics_workspace_nam
 echo "analytics_workspace_id:" $customerId
 
 container_name=windup-cli
-aci_sku=???
+aci_sku="Standard"
 
- az container create --name $container_name -g $rg_name --location $location \
+primarySharedKey=$(az monitor log-analytics workspace get-shared-keys -n $analytics_workspace_name -g $rg_name | jq -r .primarySharedKey)
+echo "primarySharedKey:" $primarySharedKey
+
+az container create --name $container_name -g $rg_name --location $location \
  --image quay.io/windupeng/windup-cli-openshift:latest \
  --cpu 1 --memory 1.5 --ports 8042 8080 \
  --azure-file-volume-account-key $storageAccountKey \
  --azure-file-volume-account-name $str_name \
- --azure-file-volume-mount-path /winshare \
+ --azure-file-volume-mount-path /mnt/winshare \
  --azure-file-volume-share-name $fs_share_name \
- --command-line "${windupBinaryPath} --input /winshare/input/${windupInput} --target ${windupTarget} --output /winshare/output/ -b" \
- --log-analytics-workspace "$analytics_workspace_id" \
- --log-analytics-workspace-key "$customerId" \
- --dns-name-label $appName
- # --sku $aci_sku
+ --dns-name-label $appName \
+ --command-line "${windupBinaryPath} --input /mnt/winshare/input/${windupInput} --target ${windupTarget} --output /mnt/winshare/output/ -b" \
+ --log-analytics-workspace $customerId \
+ --log-analytics-workspace-key $primarySharedKey \
+ --sku $aci_sku
 
- az container show -n $container_name  -g $rg_name -query "{FQDN:ipAddress.fqdn,ProvisioningState:provisioningState}" --out table
+az container show -n $container_name  -g $rg_name --query "{FQDN:ipAddress.fqdn,ProvisioningState:provisioningState}" --out table
  
- container_url=$(az container show -n $container_name  -g $rg_name --query ipAddress.fqdn -o tsv | tr -d '\r' | tr -d '"')
- echo "Check ACI container at " $container_url
+container_url=$(az container show -n $container_name  -g $rg_name --query ipAddress.fqdn -o tsv | tr -d '\r' | tr -d '"')
+echo "Check ACI container at " $container_url
+
+container_id=$(az container show -n $container_name  -g $rg_name --query id -o tsv | tr -d '\r' | tr -d '"')
+echo "Check ACI container at " $container_id
+
+az monitor diagnostic-settings create --name "dgs-$appName" --workspace $analytics_workspace_id -g $rg_name --location $location \
+--resource $container_id
+
 
 ```
