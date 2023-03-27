@@ -3,13 +3,26 @@ param location string = resourceGroup().location
 param tags object = {}
 
 param containerAppsEnvironmentName string = ''
-param containerName string = 'windup'
+param containerName string = 'windup-cli'
 param containerRegistryName string = ''
 param env array = []
 param external bool = true
-param imageName string
+param imageName string = 'quay.io/windupeng/windup-cli-openshift:latest'
 param managedIdentity bool = true
 param targetPort int = 8080
+
+@description('A UNIQUE name')
+@maxLength(21)
+param appName string = 'windup${uniqueString(resourceGroup().id, subscription().id)}'
+
+@description('The Storage Account name')
+param azureStorageName string = 'sta${appName}'
+
+@description('The Azure Files service service name')
+param azureFileServiceName string = 'default' 
+
+@description('The Azure Files Share service service name')
+param azureFileShareServiceName string = 'winupshare'
 
 
 @allowed([
@@ -69,15 +82,33 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
     template: {
       containers: [
         {
+          command: [
+            '/opt/migrationtoolkit/bin/windup-cli', '--input /winshare/input/spring-petclinic-3.0.0-SNAPSHOT.jar', '--target azure-appservice', ' --output /winshare/output/', '-b'            
+          ]          
           image: imageName
           name: containerName
-          env: env
+
+          volumeMounts: [
+            {
+              mountPath: '/winshare'
+              volumeName: 'azurefiles'
+            }
+          ]          
           resources: {
             cpu: json(containerCpuCoreCount)
             memory: containerMemory
           }
         }
       ]
+      volumes: [
+        {
+          name: 'azurefiles'
+          storageType: 'AzureFile'
+          storageName: azureStorageName
+
+        }
+      ]
+
     }
   }
 }
