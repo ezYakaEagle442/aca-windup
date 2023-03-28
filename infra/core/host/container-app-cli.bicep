@@ -1,3 +1,19 @@
+/*
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+vim arrayContent.json
+[
+  "42.42.42.42"
+]
+
+az deployment group create --name test-cli -f ./infra/core/host/container-app-cli.bicep -g rg-aca-windup \
+-p name=cb4hbdqtz5qf6 \
+-p containerAppsEnvironmentName=cae-cb4hbdqtz5qf6 \
+-p containerRegistryName=crcb4hbdqtz5qf6
+
+-p dummyArray=@arrayContent.json \
+            
+*/
+
 param name string
 param location string = resourceGroup().location
 param tags object = {}

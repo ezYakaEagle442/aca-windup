@@ -1,3 +1,20 @@
+/*
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+vim arrayContent.json
+[
+  "42.42.42.42"
+]
+
+az deployment group create --name test-ui -f ./infra/core/host/container-app-ui.bicep -g rg-aca-windup \
+-p name=cb4hbdqtz5qf6 \
+-p containerAppsEnvironmentName=cae-cb4hbdqtz5qf6 \
+-p containerRegistryName=crcb4hbdqtz5qf6 \
+-p imageName=crcb4hbdqtz5qf6.azurecr.io/windup/windup:latest
+
+-p dummyArray=@arrayContent.json \
+            
+*/
+
 param name string
 param location string = resourceGroup().location
 param tags object = {}
@@ -23,7 +40,7 @@ param targetPort int = 8080
   '2.0'    
 ])
 @description('CPU cores allocated to a single container instance, e.g. 0.5. The total CPU and memory allocations requested for all the containers in a container app must add up to one of the following combinations. See https://learn.microsoft.com/en-us/azure/container-apps/containers#configuration')
-param containerCpuCoreCount string = '1.0'
+param containerCpuCoreCount string = '2.0'
 
 @allowed([
   '0.5Gi'
@@ -36,7 +53,7 @@ param containerCpuCoreCount string = '1.0'
   '4.0Gi'    
 ])
 @description('Memory allocated to a single container instance, e.g. 1Gi. The total CPU and memory allocations requested for all the containers in a container app must add up to one of the following combinations. See https://learn.microsoft.com/en-us/azure/container-apps/containers#configuration')
-param containerMemory string = '2.0Gi'
+param containerMemory string = '4.0Gi'
 
 resource app 'Microsoft.App/containerApps@2022-10-01' = {
   name: 'windup-ui'
