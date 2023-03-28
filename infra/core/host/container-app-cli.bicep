@@ -12,6 +12,7 @@ param env array = []
 param external bool = true
 param imageName string = 'quay.io/windupeng/windup-cli-openshift:latest'
 param windupBinaryPath string = '/opt/migrationtoolkit/bin/windup-cli'
+param packages string = 'org.springframework.samples.petclinic'
 param managedIdentity bool = true
 param targetPort int = 8080
 
@@ -76,7 +77,7 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
       containers: [
         {
           command: [
-            '${windupBinaryPath}', '--input /winshare/input/${windupInput}', '--target ${windupTarget}', ' --output /winshare/output/', '-b'            
+            '${windupBinaryPath}', '--input /winshare/input/${windupInput}', '--target ${windupTarget}', '--output /winshare/output/', '--packages ${packages}',  '--overwrite', '-b'            
           ]          
           image: imageName
           name: containerName
