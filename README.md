@@ -18,12 +18,13 @@ description: Uses Azure Developer CLI (azd) to build, deploy, and monitor Windup
 
 # Windup on Azure Container Apps
 
-A complete ToDo application that includes everything you need to build, deploy, and monitor an Azure solution. This application uses the Azure Developer CLI (azd) to get you up and running on Azure quickly and Azure Monitor for monitoring and logging. 
+A ready on the shelf Windup application that includes everything you need to build, deploy, and monitor an Azure solution. 
+This application uses the Azure Developer CLI (azd) to get you up and running on Azure quickly and Azure Monitor for monitoring and logging. 
 It includes application tools, and pipelines that serve as a foundation from which you can build upon and customize when creating your own solutions.
 
 Let's jump in and get the Windup App up and running in Azure. When you are finished, you will have a fully functional web app deployed on Azure. In later steps, you'll see how to setup a pipeline and monitor the application.
 
-<img src="assets/web.png" width="75%" alt="Screenshot of deployed ToDo app">
+<img src="assets/web.png" width="75%" alt="Screenshot of deployed App">
 
 <sup>Screenshot of the deployed Windup app</sup>
 
@@ -62,7 +63,17 @@ xdg-settings set default-web-browser edge.desktop
 az login
 azd login
 
+UNIQUEID=$(openssl rand -hex 3)
+
+export AZURE_ENV_NAME=windup42
+export AZURE_LOCATION=westurope
+export RESOURCE_GROUP_NAME=rg-aca-windup
+# export AZURE_STORAGE_NAME="sta""${appName,,}"
+export AZURE_FILE_SHARE_SERVICE_NAME=windup
+export AZURE_PRINCIPAL_ID=
+
 azd up
+
 azd monitor --overview
 azd monitor --live
 azd monitor --logs
@@ -237,7 +248,7 @@ When `azd up` is complete it will output the following URLs:
 
 !["azd up output"](assets/urls.png)
 
-Click the web application URL to launch the ToDo app. Create a new collection and add some items. This will create monitoring activity in the application that you will be able to see later when you run `azd monitor`.
+Click the UI application URL to launch the Windup app. Create a new collection and add some items. This will create monitoring activity in the application that you will be able to see later when you run `azd monitor`.
 
 > NOTE:
 >
@@ -249,11 +260,10 @@ Click the web application URL to launch the ToDo app. Create a new collection an
 
 This application utilizes the following Azure resources:
 
-- [**Azure Container Apps**](https://docs.microsoft.com/azure/container-apps/) to host the UI and API backend
-- [**Azure Monitor**](https://docs.microsoft.com/azure/azure-monitor/) for monitoring and logging
-- [**Azure Key Vault**](https://docs.microsoft.com/azure/key-vault/) for securing secrets
+- [**Azure Container Apps**](https://learn.microsoft.com/azure/container-apps/) to host the UI and CLI containers
+- [**Azure Monitor**](https://learn.microsoft.com/azure/azure-monitor/) for monitoring and logging
 
-Here's a high level architecture diagram that illustrates these components. Notice that these are all contained within a single [resource group](https://docs.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal), that will be created for you when you create the resources.
+Here's a high level architecture diagram that illustrates these components. Notice that these are all contained within a single [resource group](https://learn.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal), that will be created for you when you create the resources.
 
 <img src="assets/resources.png" width="60%" alt="Application architecture diagram"/>
 
