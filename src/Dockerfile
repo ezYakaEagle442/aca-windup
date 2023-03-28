@@ -18,6 +18,7 @@ RUN mkdir /tmp/app
 WORKDIR /tmp/app
 ENV WINDUP_VERSION="6.1.6"
 ENV DISTRIBUTION_DIR="dist"
+# ENV JBOSS_CONTAINER_HOST="0.0.0.0"
 COPY ./${DISTRIBUTION_DIR}/windup-web-distribution-${WINDUP_VERSION}.Final/ /tmp/app
 EXPOSE 80 8080 8443 8042 9990 9993
 CMD ["bash", "run_windup.sh"]
