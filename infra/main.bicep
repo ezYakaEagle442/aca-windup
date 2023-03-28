@@ -9,6 +9,9 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@description('The Azure Files Share service service name')
+param azureFileShareServiceName string = 'winupshare' 
+
 // Optional parameters to override the default azd resource naming conventions. Update the main.parameters.json file to provide values. e.g.,:
 // "resourceGroupName": {
 //      "value": "myGroupName"
@@ -19,9 +22,6 @@ param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
 param logAnalyticsName string = ''
 param resourceGroupName string = ''
-
-@description('Flag to use Azure API Management to mediate the calls between the Web frontend and the backend API')
-param useAPIM bool = false
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -44,8 +44,24 @@ module containerApps './core/host/container-apps.bicep' = {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     location: location
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
+    azureStorageName: storage.outputs.azurestorageName
+    azureFileShareServiceName: azureFileShareServiceName
+  }
+  dependsOn: [
+    storage
+  ]  
+}
+
+// Monitor application with Azure Monitor
+module storage './core/storage/storage.bicep' = {
+  name: 'storage'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
   }
 }
+
 
 // Monitor application with Azure Monitor
 module monitoring './core/monitor/monitoring.bicep' = {
@@ -63,10 +79,8 @@ module monitoring './core/monitor/monitoring.bicep' = {
 // App outputs
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
-output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
+output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.containerAppsEnvironmentName
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
-output USE_APIM bool = useAPIM
-output SERVICE_API_ENDPOINTS array = []

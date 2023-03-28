@@ -43,7 +43,7 @@ windupBinaryPath="/opt/migrationtoolkit/bin/windup-cli"
 windupInput="spring-petclinic-3.0.0-SNAPSHOT.jar"
 windupTarget="azure-appservice"
 
-analytics_workspace_name="law${appName}"
+analytics_workspace_name="law-${appName}"
 echo "Analytics Workspace Name :" $analytics_workspace_name
 
 az monitor log-analytics workspace create -n $analytics_workspace_name --location $location -g $rg_name --verbose
@@ -57,11 +57,11 @@ echo "analytics_workspace_id:" $analytics_workspace_id
 customerId=$(az monitor log-analytics workspace show -n $analytics_workspace_name -g $rg_name --query customerId -o tsv | tr -d '\r' | tr -d '"')
 echo "analytics_workspace_id:" $customerId
 
-container_name=windup-cli
-aci_sku="Standard"
-
 primarySharedKey=$(az monitor log-analytics workspace get-shared-keys -n $analytics_workspace_name -g $rg_name | jq -r .primarySharedKey)
 echo "primarySharedKey:" $primarySharedKey
+
+container_name=windup-cli
+aci_sku="Standard"
 
 az container create --name $container_name -g $rg_name --location $location \
  --image quay.io/windupeng/windup-cli-openshift:latest \
@@ -89,3 +89,15 @@ az monitor diagnostic-settings create --name "dgs-$appName" --workspace $analyti
 
 
 ```
+
+[To view ACI logs](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#view-logs) :
+
+To view the container group's logs in the ContainerInstanceLog_CL table:
+
+1. Navigate to your Log Analytics workspace in the Azure portal
+2. Under General, select Logs
+3. Type the following query:
+```sql
+ContainerInstanceLog_CL | limit 50
+```
+4. Select Run

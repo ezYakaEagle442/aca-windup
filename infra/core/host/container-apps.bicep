@@ -6,6 +6,13 @@ param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
 param logAnalyticsWorkspaceName string = ''
 
+@description('The Storage Account name')
+param azureStorageName string
+
+@description('The Azure Files Share service service name')
+param azureFileShareServiceName string = 'winupshare' 
+
+
 module containerAppsEnvironment 'container-apps-environment.bicep' = {
   name: '${name}-container-apps-environment'
   params: {
@@ -13,6 +20,8 @@ module containerAppsEnvironment 'container-apps-environment.bicep' = {
     location: location
     tags: tags
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    azureFileShareServiceName: azureFileShareServiceName
+    azureStorageName: azureStorageName
   }
 }
 

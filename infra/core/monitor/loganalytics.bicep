@@ -25,7 +25,7 @@ param tags object = {}
 ]
 )
 @description('The Log AnalyticsWorkspace SKU - see https://learn.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs')
-param laSKU string = 'Free'
+param laSKU string = 'PerGB2018'
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: name

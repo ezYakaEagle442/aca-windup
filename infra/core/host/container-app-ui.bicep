@@ -39,7 +39,7 @@ param containerCpuCoreCount string = '1.0'
 param containerMemory string = '2.0Gi'
 
 resource app 'Microsoft.App/containerApps@2022-10-01' = {
-  name: name
+  name: 'windup-ui'
   location: location
   tags: tags
   identity: { type: managedIdentity ? 'SystemAssigned' : 'None' }

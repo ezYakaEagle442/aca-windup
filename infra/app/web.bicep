@@ -2,15 +2,13 @@ param name string
 param location string = resourceGroup().location
 param tags object = {}
 
-param apiBaseUrl string
 param applicationInsightsName string
 param containerAppsEnvironmentName string
 param containerRegistryName string
 param imageName string = ''
-param keyVaultName string
 param serviceName string = 'web'
 
-module app '../core/host/container-app.bicep' = {
+module app '../core/host/container-app-ui.bicep' = {
   name: '${serviceName}-container-app-module'
   params: {
     name: name
@@ -20,30 +18,17 @@ module app '../core/host/container-app.bicep' = {
     containerRegistryName: containerRegistryName
     env: [
       {
-        name: 'REACT_APP_APPLICATIONINSIGHTS_CONNECTION_STRING'
-        value: applicationInsights.properties.ConnectionString
-      }
-      {
-        name: 'REACT_APP_API_BASE_URL'
-        value: apiBaseUrl
-      }
-      {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
         value: applicationInsights.properties.ConnectionString
       }
     ]
     imageName: !empty(imageName) ? imageName : 'nginx:latest'
-    keyVaultName: keyVault.name
     targetPort: 80
   }
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: applicationInsightsName
-}
-
-resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
-  name: keyVaultName
 }
 
 output SERVICE_WEB_IDENTITY_PRINCIPAL_ID string = app.outputs.identityPrincipalId
