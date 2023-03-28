@@ -30,6 +30,7 @@ httpEndpoint=$(az storage account show --name $str_name -g $rg_name --query "pri
 smbPath=$httpEndpoint"$fs_share_name"
 storageAccountKey=$(az storage account keys list --account-name $str_name -g $rg_name --query "[0].value" | tr -d '\r' | tr -d '"')
 
+# TODO : add role Storage File Data SMB Share Contributor , need to be Contributor at RG level
 echo "httpEndpoint" $httpEndpoint
 echo "smbPath" $smbPath
 echo "storageAccountKey" $storageAccountKey
@@ -63,6 +64,8 @@ echo "primarySharedKey:" $primarySharedKey
 container_name=windup-cli
 aci_sku="Standard"
 
+packages="org.springframework.samples.petclinic"
+
 az container create --name $container_name -g $rg_name --location $location \
  --image quay.io/windupeng/windup-cli-openshift:latest \
  --cpu 1 --memory 1.5 --ports 8042 8080 \
@@ -71,7 +74,7 @@ az container create --name $container_name -g $rg_name --location $location \
  --azure-file-volume-mount-path /mnt/winshare \
  --azure-file-volume-share-name $fs_share_name \
  --dns-name-label $appName \
- --command-line "${windupBinaryPath} --input /mnt/winshare/input/${windupInput} --target ${windupTarget} --output /mnt/winshare/output/ -b" \
+ --command-line "${windupBinaryPath} --input /mnt/winshare/input/${windupInput} --target ${windupTarget} --output /mnt/winshare/output/ --overwrite --packages ${packages} -b" \
  --log-analytics-workspace $customerId \
  --log-analytics-workspace-key $primarySharedKey \
  --sku $aci_sku
