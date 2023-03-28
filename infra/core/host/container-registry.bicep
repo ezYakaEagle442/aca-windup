@@ -10,9 +10,17 @@ param encryption object = {
 }
 param networkRuleBypassOptions string = 'AzureServices'
 param publicNetworkAccess string = 'Enabled'
-param sku object = {
-  name: 'Basic'
-}
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.containerregistry/registries?pivots=deployment-language-bicep#sku
+@allowed([
+  'Basic'
+  'Premium'
+  'Standard'
+  'Classic'
+])
+@description('The ACR SKU, either Basic with admin user enabled, or Premium with scoped-permissions')
+param acrSkuName string = 'Basic'
+
 param zoneRedundancy string = 'Disabled'
 
 @description('The log analytics workspace id used for logging & monitoring')
@@ -23,7 +31,9 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
   name: name
   location: location
   tags: tags
-  sku: sku
+  sku: {
+    name: acrSkuName
+  }
   properties: {
     adminUserEnabled: adminUserEnabled
     anonymousPullEnabled: anonymousPullEnabled
