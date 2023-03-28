@@ -18,26 +18,26 @@ description: Uses Azure Developer CLI (azd) to build, deploy, and monitor Windup
 
 # Windup on Azure Container Apps
 
-A complete ToDo application that includes everything you need to build, deploy, and monitor an Azure solution. This application uses the Azure Developer CLI (azd) to get you up and running on Azure quickly, React.js for the Web application, Java for the API, Azure Cosmos DB API for MongoDB for storage, and Azure Monitor for monitoring and logging. It includes application code, tools, and pipelines that serve as a foundation from which you can build upon and customize when creating your own solutions.
+A complete ToDo application that includes everything you need to build, deploy, and monitor an Azure solution. This application uses the Azure Developer CLI (azd) to get you up and running on Azure quickly and Azure Monitor for monitoring and logging. 
+It includes application tools, and pipelines that serve as a foundation from which you can build upon and customize when creating your own solutions.
 
 Let's jump in and get the Windup App up and running in Azure. When you are finished, you will have a fully functional web app deployed on Azure. In later steps, you'll see how to setup a pipeline and monitor the application.
 
 <img src="assets/web.png" width="75%" alt="Screenshot of deployed ToDo app">
 
-<sup>Screenshot of the deployed ToDo app</sup>
+<sup>Screenshot of the deployed Windup app</sup>
 
 ## Prerequisites
 
 The following prerequisites are required to use this application. Please ensure that you have them all installed locally.
 
 - [Azure Developer CLI](https://aka.ms/azd-install)
-- [Java 17 or later](https://learn.microsoft.com/en-us/java/openjdk/install) - for API backend
+- [Java 11](https://learn.microsoft.com/en-us/java/openjdk/install) - Windup does not yet support Java 17
 - [Docker](https://docs.docker.com/get-docker/)
 
 Read : 
 - [azd CLI installation](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=localinstall%2Cwindows%2Cbrew)
 - [Java Mongo ACA sample](https://github.com/Azure-Samples/todo-java-mongo-aca)
-- []()
 
 ```sh
 curl -fsSL https://aka.ms/install-azd.sh | bash
@@ -48,6 +48,27 @@ RG_APP="rg-aca-windup"
 az group create --name $RG_APP --location $LOCATION
 
 ```
+### WSL pre-req
+
+See [https://github.com/microsoft/WSL/issues/8892](https://github.com/microsoft/WSL/issues/8892)
+```sh
+sudo apt-get update
+sudo apt install xdg-utils --yes
+sudo apt install wslu --yes
+xdg-settings set default-web-browser edge.desktop
+# BROWSER=/mnt/c/Firefox/firefox.exe
+# BROWSER="/mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe"
+# BROWSER=/mnt/c/Windows/SystemApps/Microsoft.MicrosoftEdge_8wekyb3d8bbwe
+az login
+azd login
+
+azd up
+azd monitor --overview
+azd monitor --live
+azd monitor --logs
+
+```
+
 
 ## Build
 ```sh
@@ -65,6 +86,8 @@ cd $DISTRIBUTION_DIR
 unzip windup-web-distribution-${WINDUP_VERSION}.Final-with-authentication.zip
 ```
 
+Note: if you want to run the Windup CLIn you ucan use the latest tag check at : [https://quay.io/repository/windupeng/windup-cli-openshift?tab=tags](https://quay.io/repository/windupeng/windup-cli-openshift?tab=tags), it will require [Azure Files which is supported by ACA](https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts?pivots=azure-cli#azure-files)
+
 ## Run
 
 1. Open codespaces
@@ -72,9 +95,19 @@ unzip windup-web-distribution-${WINDUP_VERSION}.Final-with-authentication.zip
 3. Click on Debug: Run all and enjoy
 
 ```sh
-
+az login
+azd login
 ```
 
+```sh
+azd monitor --overview
+azd monitor --live
+azd monitor --logs
+
+# cleanup
+# azd down
+
+```
 
 ## Quickstart: Deploy to Azure
 
