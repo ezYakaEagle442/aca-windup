@@ -6,9 +6,9 @@ param applicationInsightsName string
 param containerAppsEnvironmentName string
 param containerRegistryName string
 param imageName string = ''
-param serviceName string = 'web'
+param serviceName string = 'ui'
 
-module app '../core/host/container-app-ui.bicep' = {
+module ui '../core/host/container-app-ui.bicep' = {
   name: '${serviceName}-container-app-module'
   params: {
     name: name
@@ -31,7 +31,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   name: applicationInsightsName
 }
 
-output SERVICE_WEB_IDENTITY_PRINCIPAL_ID string = app.outputs.identityPrincipalId
-output SERVICE_WEB_NAME string = app.outputs.name
-output SERVICE_WEB_URI string = app.outputs.uri
-output SERVICE_WEB_IMAGE_NAME string = app.outputs.imageName
+output UI_IDENTITY_PRINCIPAL_ID string = ui.outputs.identityPrincipalId
+output UI_NAME string = ui.outputs.name
+output UI_URI string = ui.outputs.uri
+output UI_IMAGE_NAME string = ui.outputs.imageName

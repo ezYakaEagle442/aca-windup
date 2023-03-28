@@ -11,27 +11,18 @@ az deployment group create --name test-storage -f ./infra/core/storage/storage.b
 -p dummyArray=@arrayContent.json \
             
 */
-@description('A UNIQUE name')
-@maxLength(21)
-param appName string = 'windup${uniqueString(resourceGroup().id, subscription().id)}'
+
+@description('The Storage Account name')
+param azureStorageName string
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
-
-@description('The Storage Account name')
-param azureStorageName string = 'sta${appName}'
 
 @description('The Azure Files service service name')
 param azureFileServiceName string = 'default' 
 
 @description('The Azure Files Share service service name')
-param azureFileShareServiceName string = 'winupshare'
-
-@description('The BLOB Storage service name')
-param azureBlobServiceName string = 'default' // '${appName}-blob-svc'
-
-@description('The BLOB Storage Container name')
-param blobContainerName string = '${appName}-blob'
+param azureFileShareServiceName string
 
 @description('The VNet rules to whitelist for the Strorage Account')
 param  vNetRules array = []

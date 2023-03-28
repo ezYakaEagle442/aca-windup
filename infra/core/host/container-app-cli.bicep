@@ -15,19 +15,8 @@ param windupBinaryPath string = '/opt/migrationtoolkit/bin/windup-cli'
 param managedIdentity bool = true
 param targetPort int = 8080
 
-@description('A UNIQUE name')
-@maxLength(21)
-param appName string = 'windup${uniqueString(resourceGroup().id, subscription().id)}'
-
 @description('The Storage Account name')
-param azureStorageName string = 'sta${appName}'
-
-@description('The Azure Files service service name')
-param azureFileServiceName string = 'default' 
-
-@description('The Azure Files Share service service name')
-param azureFileShareServiceName string = 'winupshare'
-
+param azureStorageName string
 
 @allowed([
   '0.25'

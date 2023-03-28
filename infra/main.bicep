@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @minLength(1)
-@maxLength(64)
+@maxLength(21)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
 param environmentName string
 
@@ -9,8 +9,11 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@description('The Storage Account name')
+param azureStorageName string = ''
+
 @description('The Azure Files Share service service name')
-param azureFileShareServiceName string = 'winupshare' 
+param azureFileShareServiceName string = ''
 
 // Optional parameters to override the default azd resource naming conventions. Update the main.parameters.json file to provide values. e.g.,:
 // "resourceGroupName": {
@@ -59,6 +62,8 @@ module storage './core/storage/storage.bicep' = {
   params: {
     location: location
     tags: tags
+    azureStorageName: !empty(azureStorageName) ? azureStorageName : '${abbrs.storageStorageAccounts}${resourceToken}'
+    azureFileShareServiceName: !empty(azureFileShareServiceName) ? azureFileShareServiceName : '${resourceToken}'
   }
 }
 

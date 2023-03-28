@@ -4,13 +4,6 @@ param tags object = {}
 
 param logAnalyticsWorkspaceName string
 
-@description('A UNIQUE name')
-@maxLength(21)
-param appName string = 'windup${uniqueString(resourceGroup().id, subscription().id)}'
-
-@description('The Azure Files service service name')
-param azureFileServiceName string = 'default' 
-
 @description('The Storage Account name')
 param azureStorageName string
 
@@ -54,7 +47,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-09-01' existing = 
 }
 
 resource acastorage 'Microsoft.App/managedEnvironments/storages@2022-10-01' = {
-  name: name
+  name: '${name}-storage'
   parent: containerAppsEnvironment
   properties: {
     azureFile: {

@@ -7,10 +7,10 @@ param containerRegistryName string = ''
 param logAnalyticsWorkspaceName string = ''
 
 @description('The Storage Account name')
-param azureStorageName string
+param azureStorageName string = ''
 
 @description('The Azure Files Share service service name')
-param azureFileShareServiceName string = 'winupshare' 
+param azureFileShareServiceName string = ''
 
 
 module containerAppsEnvironment 'container-apps-environment.bicep' = {

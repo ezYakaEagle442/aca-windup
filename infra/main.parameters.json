@@ -5,17 +5,20 @@
     "environmentName": {
       "value": "${AZURE_ENV_NAME}"
     },
+    "resourceGroupName": {
+      "value": "${RESOURCE_GROUP_NAME}"
+    },
     "location": {
       "value": "${AZURE_LOCATION}"
     },
+    "azureStorageName": {
+      "value": "${AZURE_STORAGE_NAME}"
+    },
+    "azureFileShareServiceName": {
+      "value": "${AZURE_FILE_SHARE_SERVICE_NAME}"
+    },
     "principalId": {
       "value": "${AZURE_PRINCIPAL_ID}"
-    },
-    "webImageName": {
-      "value": "${SERVICE_WEB_IMAGE_NAME}"
-    },
-   "resourceGroupName": {
-      "value": "rg-aca-windup"
     }
   }
 }

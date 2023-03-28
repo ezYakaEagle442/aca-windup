@@ -5,12 +5,6 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
-    "name": {
-      "value": "${SERVICE_WEB_NAME}"
-    },
-    "imageName": {
-      "value": "${SERVICE_WEB_IMAGE_NAME}"
-    },
     "applicationInsightsName": {
       "value": "${APPLICATIONINSIGHTS_NAME}"
     },
@@ -19,6 +13,12 @@
     },
     "containerRegistryName": {
       "value": "${AZURE_CONTAINER_REGISTRY_NAME}"
-    }
+    },
+    "azureStorageName": {
+      "value": "${AZURE_STORAGE_NAME}"
+    },
+    "azureFileShareServiceName": {
+      "value": "${AZURE_FILE_SHARE_SERVICE_NAME}"
+    }    
   }
 }

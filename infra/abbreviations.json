@@ -118,7 +118,7 @@
     "sqlServersDataWarehouse": "sqldw-",
     "sqlServersDatabases": "sqldb-",
     "sqlServersDatabasesStretch": "sqlstrdb-",
-    "storageStorageAccounts": "st",
+    "storageStorageAccounts": "sta",
     "storageStorageAccountsVm": "stvm",
     "storSimpleManagers": "ssimp",
     "streamAnalyticsCluster": "asa-",
