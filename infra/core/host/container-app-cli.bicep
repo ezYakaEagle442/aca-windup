@@ -19,7 +19,7 @@ param location string = resourceGroup().location
 param tags object = {}
 
 param containerAppsEnvironmentName string = ''
-param windupInput string = 'spring-petclinic-3.0.0-SNAPSHOT.jar'
+param windupInput string = 'app.jar'
 param windupTarget string = 'azure-appservice'
 
 param containerName string = 'windup-cli'
