@@ -39,9 +39,21 @@ export RESOURCE_GROUP=$rg_name
 export STORAGE_ACCOUNT_NAME=$str_name
 export SHARE_NAME=$fs_share_name
 
+
+az storage directory create --name input
+--share-name $SHARE_NAME --account-name $STORAGE_ACCOUNT_NAME
+
+az storage directory create --name output
+--share-name $SHARE_NAME --account-name $STORAGE_ACCOUNT_NAME
+
+az storage file upload \
+--share-name $STORAGE_SHARE --account-name $STORAGE_ACCOUNT \
+--source /tmp/spring-petclinic-main/target/spring-petclinic-thin.jar \
+--path input/app.jar
+
 imageName="quay.io/windupeng/windup-cli-openshift:latest"
 windupBinaryPath="/opt/migrationtoolkit/bin/windup-cli"
-windupInput="spring-petclinic-3.0.0-SNAPSHOT.jar"
+windupInput="app.jar"
 windupTarget="azure-appservice"
 
 analytics_workspace_name="law-${appName}"
