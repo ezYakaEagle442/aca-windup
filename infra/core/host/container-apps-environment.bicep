@@ -46,8 +46,9 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-09-01' existing = 
   name: azureStorageName
 }
 
+// https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts?pivots=azure-resource-manager#azure-files
 resource acastorage 'Microsoft.App/managedEnvironments/storages@2022-10-01' = {
-  name: '${name}-storage'
+  name: azureFileShareServiceName
   parent: containerAppsEnvironment
   properties: {
     azureFile: {
