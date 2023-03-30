@@ -5,7 +5,7 @@ param tags object = {}
 param applicationInsightsName string
 param containerAppsEnvironmentName string
 param containerRegistryName string
-param imageName string = ''
+param imageName string = 'quay.io/windupeng/windup-web-openshift:latest'
 param serviceName string = 'ui'
 
 module ui '../core/host/container-app-ui.bicep' = {
