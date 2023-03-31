@@ -55,6 +55,10 @@ module containerApps './core/host/container-apps.bicep' = {
   ]  
 }
 
+output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.containerAppsEnvironmentName
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
+output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
+
 // Monitor application with Azure Monitor
 module storage './core/storage/storage.bicep' = {
   name: 'storage'
@@ -66,6 +70,14 @@ module storage './core/storage/storage.bicep' = {
     azureFileShareServiceName: !empty(azureFileShareServiceName) ? azureFileShareServiceName : '${resourceToken}'
   }
 }
+
+output azurestorageId string = storage.outputs.azurestorageId
+output azurestorageName string = storage.outputs.azurestorageName
+output azurestorageFileEndpoint string = storage.outputs.azurestorageFileEndpoint
+output azureFileServiceId string = storage.outputs.azureFileServiceId
+output azureFileServiceName string = storage.outputs.azureFileServiceName
+output azureFileShareServiceId string = storage.outputs.azureFileShareServiceId
+output azureFileShareServiceName string = storage.outputs.azureFileShareServiceName
 
 
 // Monitor application with Azure Monitor
@@ -84,8 +96,6 @@ module monitoring './core/monitor/monitoring.bicep' = {
 // App outputs
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
-output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.containerAppsEnvironmentName
-output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
-output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
+
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
