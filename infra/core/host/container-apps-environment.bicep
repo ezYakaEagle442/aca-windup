@@ -8,7 +8,7 @@ param logAnalyticsWorkspaceName string
 param azureStorageName string
 
 @description('The Azure Files Share service service name')
-param azureFileShareServiceName string = 'winupshare' 
+param azureFileShareServiceName string = 'windupshare' 
 
 @allowed([
   'log-analytics'

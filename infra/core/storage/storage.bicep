@@ -22,7 +22,7 @@ param location string = resourceGroup().location
 param azureFileServiceName string = 'default' 
 
 @description('The Azure Files Share service service name')
-param azureFileShareServiceName string
+param azureFileShareServiceName string = 'windupshare'
 
 @description('The VNet rules to whitelist for the Strorage Account')
 param  vNetRules array = []
@@ -104,7 +104,23 @@ output azurestorageFileEndpoint string = azurestorage.properties.primaryEndpoint
 resource azurefileservice 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
   name: azureFileServiceName
   parent: azurestorage
+  /* This property when set to true allows deletion of the soft deleted blob versions and snapshots. 
+  This property cannot be used blob restore policy. This property only applies to blob service and does not apply to containers or file share.
+  properties: {
+    shareDeleteRetentionPolicy: {
+      allowPermanentDelete: true
+      days: 1
+      enabled: true
+    }
+    protocolSettings: {
+      
+    }
+  }
+  */
 }
+
+output azureFileServiceId string = azurefileservice.id
+output azureFileServiceName string = azurefileservice.name
 
 resource azurefileshareservice 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
   name: azureFileShareServiceName
@@ -114,54 +130,8 @@ resource azurefileshareservice 'Microsoft.Storage/storageAccounts/fileServices/s
     metadata: {}
     rootSquash: 'NoRootSquash'
     shareQuota: 1024
-  }  
-}
-
-
-/*
-resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
-  name: azureBlobServiceName
-  parent: azurestorage
-  properties: {
-    containerDeleteRetentionPolicy: {
-      allowPermanentDelete: true
-      days: 1
-      enabled: true
-    }
-    // defaultServiceVersion: ''
-    deleteRetentionPolicy: {
-      allowPermanentDelete: true
-      days: 1
-      enabled: true
-    }
-    isVersioningEnabled: false
-    lastAccessTimeTrackingPolicy: {
-      blobType: [
-        'blockBlob'
-      ]
-      enable: false
-      name: 'AccessTimeTracking'
-      trackingGranularityInDays: 1
-    }
-    restorePolicy: {
-      days: 2
-      enabled: false
-    }
   }
 }
-output azureblobserviceId string = azureblobservice.id
-output azureblobserviceName string = azureblobservice.name
 
-resource blobcontainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: blobContainerName
-  parent: azureblobservice
-  properties: {
-    enableNfsV3AllSquash: false
-    enableNfsV3RootSquash: false
-
-    publicAccess: 'Container'
-  }
-}
-output blobcontainerId string = blobcontainer.id
-output blobcontainerName string = blobcontainer.name
-*/
+output azureFileShareServiceId string = azurefileshareservice.id
+output azureFileShareServiceName string = azurefileshareservice.name
