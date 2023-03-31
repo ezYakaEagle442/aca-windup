@@ -1,9 +1,27 @@
+name: Deploy WindUp
+
+env:
+
+  # ==== Versions ====
+  
+  AZ_CLI_VERSION: 2.46.0
+
+  # ==== General settings  ====
+
+  APP_NAME: windup
+  LOCATION: westeurope
+  RESOURCE_GROUP_NAME: rg-aca-windup # RG where to deploy the other Azure services: ACA, Storage, ACR, etc.
+  
+  AZURE_ENV_NAME: windup
+  AZURE_FILE_SHARE_SERVICE_NAME: windup
+
+  ################################## DO NOT CHANGE params below   ##################################
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
-      - master
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
@@ -47,6 +65,22 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Display environment variables
+        run: |
+
+          echo "Checking GITHUB_ENV"
+          echo "APP_NAME="$APP_NAME
+          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME"
+          echo "AZURE_ENV_NAME="$AZURE_ENV_NAME
+          echo "AZURE_FILE_SHARE_SERVICE_NAME="$AZURE_FILE_SHARE_SERVICE_NAME
+
+          export APP_NAME=${{ env.APP_NAME }}
+          export RESOURCE_GROUP_NAME=${{ env.RESOURCE_GROUP_NAME }}
+          export AZURE_ENV_NAME=${{ env.AZURE_ENV_NAME }}
+          export AZURE_FILE_SHARE_SERVICE_NAME=${{ env.AZURE_FILE_SHARE_SERVICE_NAME }}
+
+        shell: bash
+
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
@@ -60,3 +94,32 @@ jobs:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Display Bicep outputs
+        run: |
+          
+          storage_name=$(az deployment group show --name storage -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.azurestorageName.value -o tsv)
+          echo "storage_name=" $storage_name
+          echo "AZ_STORAGE_NAME="$storage_name >> $GITHUB_ENV
+
+          azureFileServiceName=$(az deployment group show --name storage -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.azureFileServiceName.value -o tsv)
+          echo "azureFileServiceName=" $azureFileServiceName
+          echo "AZ_STORAGE_FILE_SVC_NAME="$azureFileServiceName >> $GITHUB_ENV
+
+          azureFileShareServiceName=$(az deployment group show --name storage -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.azureFileShareServiceName.value -o tsv)
+          echo "azureFileShareServiceName=" $azureFileShareServiceName
+          echo "AZ_STORAGE_FILE_SHARE_NAME="$azureFileShareServiceName >> $GITHUB_ENV
+
+          ACA_ENV_NAME=$(az deployment group show --name containerApps -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.containerAppsEnvironmentName.value -o tsv)
+          echo "ACA_ENV_NAME="$ACA_ENV_NAME
+          echo "ACA_ENV_NAME="$ACA_ENV_NAME >> $GITHUB_ENV
+
+          AZURE_CONTAINER_REGISTRY_ENDPOINT=$(az deployment group show --name containerApps -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.registryLoginServer.value -o tsv)
+          echo "AZURE_CONTAINER_REGISTRY_ENDPOINT="$AZURE_CONTAINER_REGISTRY_ENDPOINT
+          echo "AZURE_CONTAINER_REGISTRY_ENDPOINT="$AZURE_CONTAINER_REGISTRY_ENDPOINT >> $GITHUB_ENV
+
+          AZURE_CONTAINER_REGISTRY_NAME=$(az deployment group show --name containerApps -g ${{ env.RESOURCE_GROUP_NAME }} --query properties.outputs.registryName.value -o tsv)
+          echo "AZURE_CONTAINER_REGISTRY_NAME="$AZURE_CONTAINER_REGISTRY_NAME
+          echo "AZURE_CONTAINER_REGISTRY_NAME="$AZURE_CONTAINER_REGISTRY_NAME >> $GITHUB_ENV
+
+        shell: bash
