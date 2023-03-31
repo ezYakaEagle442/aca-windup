@@ -51,6 +51,8 @@ az group create --name $RG_APP --location $LOCATION
 ```
 ### WSL pre-req
 
+This is optional, only if you do prefer to use WSL instead of Codespaces.
+
 See [https://github.com/microsoft/WSL/issues/8892](https://github.com/microsoft/WSL/issues/8892)
 ```sh
 sudo apt-get update
@@ -66,9 +68,10 @@ azd login
 UNIQUEID=$(openssl rand -hex 3)
 
 export AZURE_ENV_NAME=windup42
-export AZURE_LOCATION=westurope
+export AZURE_LOCATION=westeurope
 export RESOURCE_GROUP_NAME=rg-aca-windup
-# export AZURE_STORAGE_NAME="sta""${appName,,}"
+# export AZURE_STORAGE_NAME="sta""${UNIQUEID,,}"
+# unset AZURE_STORAGE_NAME
 export AZURE_FILE_SHARE_SERVICE_NAME=windup
 export AZURE_PRINCIPAL_ID=
 
@@ -80,24 +83,9 @@ azd monitor --logs
 
 ```
 
-
 ## Build
-```sh
-WINDUP_VERSION="6.1.6"
 
-wget https://repo1.maven.org/maven2/org/jboss/windup/windup-cli/${WINDUP_VERSION}.Final/windup-cli-${WINDUP_VERSION}.Final-offline.zip
-gunzip windup-cli-${WINDUP_VERSION}.Final-offline.zip
-
-DISTRIBUTION_DIR=dist
-mkdir $DISTRIBUTION_DIR
-
-wget https://repo1.maven.org/maven2/org/jboss/windup/web/windup-web-distribution/${WINDUP_VERSION}.Final/windup-web-distribution-${WINDUP_VERSION}.Final-with-authentication.zip -O $DISTRIBUTION_DIR
-
-cd $DISTRIBUTION_DIR
-unzip windup-web-distribution-${WINDUP_VERSION}.Final-with-authentication.zip
-```
-
-Note: if you want to run the Windup CLIn you ucan use the latest tag check at : [https://quay.io/repository/windupeng/windup-cli-openshift?tab=tags](https://quay.io/repository/windupeng/windup-cli-openshift?tab=tags), it will require [Azure Files which is supported by ACA](https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts?pivots=azure-cli#azure-files)
+If you want to build the container image from the sources instead of using the latest one provided by RedHat, read [this page](./build_container_from_sources.md)
 
 ## Run
 
@@ -114,10 +102,12 @@ azd login
 azd monitor --overview
 azd monitor --live
 azd monitor --logs
+```
 
-# cleanup
-# azd down
-
+To cleanup : 
+<span style="color:red">**/!\ IMPORTANT WARNING: this command woill delete all the Windup resources including the Resource Group**</span>
+```sh
+azd down
 ```
 
 ## Quickstart: Deploy to Azure
@@ -367,6 +357,8 @@ The Azure Developer CLI includes many other commands to help with your Azure dev
 ## Troubleshooting/Known issues
 
 Sometimes, things go awry. If you happen to run into issues, then please review our ["Known Issues"](https://aka.ms/azure-dev/knownissues) page for help. If you continue to have issues, then please file an issue in our main [Azure Dev](https://aka.ms/azure-dev/issues) repository.
+
+See [Windup Issue #3774](https://issues.redhat.com/projects/WINDUP/issues/WINDUP-3774?filter=allopenissues)
 
 ## Security
 
