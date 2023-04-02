@@ -1,3 +1,7 @@
+// https://issues.redhat.com/browse/WINDUP-3774
+// https://github.com/windup/windup-openshift/blob/master/templates/src/main/resources/web-template-empty-dir-executor.json#L309
+// https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications/5.0/html/web_console_guide/installing_the_web_console
+
 param name string
 param location string = resourceGroup().location
 param tags object = {}
@@ -7,6 +11,12 @@ param containerAppsEnvironmentName string
 param containerRegistryName string
 param imageName string = 'quay.io/windupeng/windup-web-openshift:latest'
 param serviceName string = 'ui'
+
+@allowed([
+  8042
+  8080
+])
+param appPort int = 8080
 
 module ui '../core/host/container-app-ui.bicep' = {
   name: '${serviceName}-container-app-module'
@@ -23,7 +33,7 @@ module ui '../core/host/container-app-ui.bicep' = {
       }
     ]
     imageName: !empty(imageName) ? imageName : 'nginx:latest'
-    targetPort: 80
+    targetPort: appPort
   }
 }
 
