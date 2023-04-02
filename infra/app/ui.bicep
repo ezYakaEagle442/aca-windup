@@ -366,7 +366,7 @@ var env = [
   }
   {
       name: 'AUTO_DEPLOY_EXPLODED'
-      value: 'AUTO_DEPLOY_EXPLODED'
+      value: string(AUTO_DEPLOY_EXPLODED)
   }
   {
       name: 'DEFAULT_JOB_REPOSITORY'
@@ -422,7 +422,7 @@ var env = [
   }
   {
       name: 'SSO_ENABLE_CORS'
-      value: 'SSO_ENABLE_CORS'
+      value: string(SSO_ENABLE_CORS)
   }
   {
       name: 'SSO_SAML_LOGOUT_PAGE'
@@ -430,7 +430,7 @@ var env = [
   }
   {
       name: 'SSO_DISABLE_SSL_CERTIFICATE_VALIDATION'
-      value: 'SSO_DISABLE_SSL_CERTIFICATE_VALIDATION'
+      value: string(SSO_DISABLE_SSL_CERTIFICATE_VALIDATION)
   }
   {
       name: 'SSO_TRUSTSTORE'
