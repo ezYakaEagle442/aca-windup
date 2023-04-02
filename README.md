@@ -45,8 +45,8 @@ curl -fsSL https://aka.ms/install-azd.sh | bash
 azd template list
 
 LOCATION="westeurope"
-RG_APP="rg-aca-windup"
-az group create --name $RG_APP --location $LOCATION
+RESOURCE_GROUP_NAME="rg-aca-windup"
+az group create --name $RESOURCE_GROUP_NAME --location $LOCATION
 
 ```
 ### WSL pre-req
@@ -55,10 +55,11 @@ This is optional, only if you do prefer to use WSL instead of Codespaces.
 
 See [https://github.com/microsoft/WSL/issues/8892](https://github.com/microsoft/WSL/issues/8892)
 ```sh
-sudo apt-get update
-sudo apt install xdg-utils --yes
-sudo apt install wslu --yes
-xdg-settings set default-web-browser edge.desktop
+#sudo apt-get update
+#sudo apt install xdg-utils --yes
+#sudo apt install wslu --yes
+#xdg-settings set default-web-browser edge.desktop
+
 # BROWSER=/mnt/c/Firefox/firefox.exe
 # BROWSER="/mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe"
 # BROWSER=/mnt/c/Windows/SystemApps/Microsoft.MicrosoftEdge_8wekyb3d8bbwe
@@ -166,9 +167,9 @@ az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${AZURE_
 # https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#prerequisites
 # /!\ To assign Azure roles, you must have: requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, 
 # such as User Access Administrator or Owner.
-az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role Owner
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME} --role Owner
 
-az role assignment create --role contributor --subscription ${AZURE_SUBSCRIPTION_ID} --assignee $SPN_APP_ID --scope /subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${RG_APP}
+az role assignment create --role contributor --subscription ${AZURE_SUBSCRIPTION_ID} --assignee $SPN_APP_ID --scope /subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}
 ```
 
 
