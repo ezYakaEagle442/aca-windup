@@ -61,6 +61,12 @@ param containerCpuCoreCount string = '1.0'
 @description('Memory allocated to a single container instance, e.g. 1Gi. The total CPU and memory allocations requested for all the containers in a container app must add up to one of the following combinations. See https://learn.microsoft.com/en-us/azure/container-apps/containers#configuration')
 param containerMemory string = '2.0Gi'
 
+
+// 2022-02-01-preview needed for anonymousPullEnabled
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
+  name: containerRegistryName
+}
+
 resource app 'Microsoft.App/containerApps@2022-10-01' = {
   name: 'windup-cli'
   location: location
@@ -77,7 +83,7 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
       }
       secrets: [
         {
-          name: 'registry-password'
+          name: 'registrypassword'
           value: containerRegistry.listCredentials().passwords[0].value
         }
       ]
@@ -85,7 +91,7 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
         {
           server: '${containerRegistry.name}.azurecr.io'
           username: containerRegistry.name
-          passwordSecretRef: 'registry-password'
+          passwordSecretRef: 'registrypassword'
         }
       ]
     }
@@ -125,11 +131,6 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-10-01' existing = {
   name: containerAppsEnvironmentName
-}
-
-// 2022-02-01-preview needed for anonymousPullEnabled
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
-  name: containerRegistryName
 }
 
 output identityPrincipalId string = managedIdentity ? app.identity.principalId : ''
