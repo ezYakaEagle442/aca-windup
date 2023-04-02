@@ -1,9 +1,22 @@
+/*
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+vim arrayContent.json
+[
+  "20.13.108.80"
+]
+
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+az deployment group create --name test-db-f ./infra/core/database/postgresql/flexibleserver.bicep -g rg-aca-windup \
+-p resourceGroupName=rg-aca-windup \
+-p azureContainerAppsOutboundPubIP=@arrayContent.json \
+-p administratorLoginPassword=XXX \
+-p allowedSingleIPs=@arrayContent.json
+
+-p location=westeurope            
+*/
 param name string
 param location string = resourceGroup().location
 param tags object = {}
-
-param sku object
-param storage object
 
 @description('Azure Container Apps Outbound Public IP as an Array')
 param azureContainerAppsOutboundPubIP array
@@ -55,12 +68,17 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
   location: location
   tags: tags
   name: name
-  sku: sku
+  sku: {
+    name: databaseSkuName
+    tier: databaseSkuTier
+  }
   properties: {
     version: version
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorLoginPassword
-    storage: storage
+    storage: {
+      storageSizeGB: 32
+    }
     highAvailability: {
       mode: 'Disabled'
     }
@@ -75,7 +93,7 @@ output POSTGRES_DOMAIN_NAME string = postgresServer.properties.fullyQualifiedDom
 output POSTGRES_ID string = postgresServer.id
 output POSTGRES_SERVER_NAME string = postgresServer.name
 
-resource PostgreSQLDB 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2022-12-01' =  {
+resource postgresDB 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2022-12-01' =  {
   name: dbName
   parent: postgresServer
   properties: {
@@ -84,8 +102,8 @@ resource PostgreSQLDB 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2022-
   }
 }
 
-output PostgreSQLDBResourceID string = PostgreSQLDB.id
-output PostgreSQLDBName string = PostgreSQLDB.name
+output PostgreSQLDBResourceID string = postgresDB.id
+output PostgreSQLDBName string = postgresDB.name
   
  resource fwRuleAllowACA 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = {
   name: 'Allow-ACA-OutboundPubIP'
