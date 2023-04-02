@@ -1,3 +1,12 @@
+/*
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+az deployment group create --name test-main-ace -f ./infra/core/host/container-apps-environment.bicep -g rg-aca-windup \
+-p resourceGroupName=rg-aca-windup \
+-p azureFileShareServiceName=winupshare \
+-p azureStorageName=stacb4hbdqtz5qf6 \
+-p location=westeurope            
+*/
+
 param name string
 param location string = resourceGroup().location
 param tags object = {}
@@ -5,7 +14,7 @@ param tags object = {}
 param logAnalyticsWorkspaceName string
 
 @description('The Storage Account name')
-param azureStorageName string
+param azureStorageName string = ''
 
 @description('The Azure Files Share service service name')
 param azureFileShareServiceName string = 'windupshare' 

@@ -1,3 +1,11 @@
+/*
+ https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli#inline-parameters 
+az deployment group create --name test-main-cli -f ./infra/main.bicep -g rg-aca-windup \
+-p resourceGroupName=rg-aca-windup \
+-p azureFileShareServiceName=winupshare \
+-p location=westeurope            
+*/
+
 targetScope = 'subscription'
 
 @minLength(1)
