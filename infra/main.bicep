@@ -30,9 +30,45 @@ param azureFileShareServiceName string = ''
 param applicationInsightsDashboardName string = ''
 param applicationInsightsName string = ''
 param containerAppsEnvironmentName string = ''
+param pgServerName string = ''
 param containerRegistryName string = ''
 param logAnalyticsName string = ''
 param resourceGroupName string = ''
+
+@description('The PostgreSQL DB Admin Login. IMPORTANT: username can not start with prefix "pg_" which is reserved, ex: pg_adm would fails in Bicep. Admin login name cannot be azure_superuser, azuresu, azure_pg_admin, sa, admin, administrator, root, guest, dbmanager, loginmanager, dbo, information_schema, sys, db_accessadmin, db_backupoperator, db_datareader, db_datawriter, db_ddladmin, db_denydatareader, db_denydatawriter, db_owner, db_securityadmin, public')
+param administratorLogin string = 'pgs_adm'
+
+@secure()
+param administratorLoginPassword string
+
+@description('The PostgreSQL DB name.')
+param dbName string = 'windup'
+
+// https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-deploy-on-azure-free-account
+@description('Azure database for PostgreSQL SKU')
+@allowed([
+  'Standard_D4s_v3'
+  'Standard_D2s_v3'
+  'Standard_B1ms'
+])
+param databaseSkuName string = 'Standard_B1ms'
+
+@description('Azure database for PostgreSQL pricing tier')
+@allowed([
+  'Burstable'
+  'GeneralPurpose'
+  'MemoryOptimized'
+])
+param databaseSkuTier string = 'Burstable'
+
+@description('PostgreSQL version. See https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-supported-versions')
+@allowed([
+  '14'
+  '13'
+  '12'
+  '11'
+])
+param version string = '14' // https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-supported-versions
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -66,6 +102,46 @@ module containerApps './core/host/container-apps.bicep' = {
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.containerAppsEnvironmentName
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
+
+
+module hello './core/host/aca-hello.bicep' = {
+  name: 'hello-app'
+  scope: rg
+  params: {
+    location: location
+    tags: union(tags, { 'azd-service-name': 'hello' })
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+  }
+  dependsOn: [
+    containerApps
+  ]
+}
+
+module db './core/database/postgresql/flexibleserver.bicep' = {
+  name: 'postgresql'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
+    azureContainerAppsOutboundPubIP: hello.outputs.helloContainerAppoutboundIpAddresses
+    allowedSingleIPs: hello.outputs.helloContainerAppoutboundIpAddresses
+    version: version
+    databaseSkuName: databaseSkuName
+    databaseSkuTier: databaseSkuTier
+    dbName: dbName
+    name: !empty(pgServerName) ? pgServerName : '${abbrs.dBforPostgreSQLServers}${resourceToken}'
+    administratorLogin: administratorLogin
+    administratorLoginPassword: administratorLoginPassword
+  }
+  dependsOn: [
+    hello
+  ]
+}
+
+output postgresqlId string = db.outputs.POSTGRES_ID
+output postgresqlServerName string = db.outputs.POSTGRES_SERVER_NAME
+output postgresqlDomainName string = db.outputs.POSTGRES_DOMAIN_NAME
+
 
 // Monitor application with Azure Monitor
 module storage './core/storage/storage.bicep' = {
