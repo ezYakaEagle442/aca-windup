@@ -1,5 +1,10 @@
 # Build Windup UI container from sources
 
+Read [https://github.com/jboss-dockerfiles/wildfly](https://github.com/jboss-dockerfiles/wildfly)
+The WindUp Docker image is built using jKube, see the [POM file](https://github.com/windup/windup-openshift/blob/master/web/pom.xml#L15).
+
+There is a Dockerfile in the WindUp Distribution at XXX
+
 ## Prerequisites
 
 The following prerequisites are required to use this application. Please ensure that you have them all installed locally.
@@ -9,16 +14,31 @@ The following prerequisites are required to use this application. Please ensure 
 
 
 ```sh
-LOCATION="westeurope"
-RG_APP="rg-aca-windup"
-az group create --name $RG_APP --location $LOCATION
+export AZURE_AZURE_LOCATION=westeurope
+export RESOURCE_GROUP_NAME=rg-aca-windup
+
+az group create --name $RESOURCE_GROUP_NAME --AZURE_LOCATION $AZURE_LOCATION
+docker login
+
+#git clone https://github.com/windup/windup-openshift
+#sudo apt-get install podman --yes
+#cd windup-openshift
+#mvn clean install -Ddocker.name.windup.web=<your_quay_id>/windup-web-openshift -Ddocker.name.windup.web.executor=<your_quay_id>/windup-web-openshift-messaging-executor
+# mvn clean package -DskipTests
 
 ```
 ### WSL pre-req
 
 This is optional, only if you do prefer to use WSL instead of Codespaces.
 
+
+```sh
+az login
+azd login
+```
+If the above login CLI command fails on WSL-Ubuntu 22.04 with error xdg-open: no method available for opening 'https://microsoft.com'
 See [https://github.com/microsoft/WSL/issues/8892](https://github.com/microsoft/WSL/issues/8892)
+Run the snippet below
 ```sh
 sudo apt-get update
 sudo apt install xdg-utils --yes
@@ -27,13 +47,14 @@ xdg-settings set default-web-browser edge.desktop
 # BROWSER=/mnt/c/Firefox/firefox.exe
 # BROWSER="/mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe"
 # BROWSER=/mnt/c/Windows/SystemApps/Microsoft.MicrosoftEdge_8wekyb3d8bbwe
-az login
-azd login
+```
 
+
+```sh
 UNIQUEID=$(openssl rand -hex 3)
 
 export AZURE_ENV_NAME=windup42
-export AZURE_LOCATION=westeurope
+export AZURE_AZURE_LOCATION=westeurope
 export RESOURCE_GROUP_NAME=rg-aca-windup
 # export AZURE_STORAGE_NAME="sta""${UNIQUEID,,}"
 # unset AZURE_STORAGE_NAME
@@ -50,8 +71,12 @@ The Docker file is located at [./src/Dockerfile](./src/Dockerfile)
 WINDUP_VERSION="6.2.0-SNAPSHOT"
 BUILD_ID="20230330.071913-130-with-authentication"
 
-wget https://repo1.maven.org/maven2/org/jboss/windup/windup-cli/${WINDUP_VERSION}.Final/windup-cli-${WINDUP_VERSION}.Final-offline.zip
-gunzip windup-cli-${WINDUP_VERSION}.Final-offline.zip
+# https://repo1.maven.org/maven2/org/jboss/windup/web/windup-web-distribution/6.1.7.Final/windup-web-distribution-6.1.7.Final-with-authentication.zip
+
+#wget https://repo1.maven.org/maven2/org/jboss/windup/windup-cli/${WINDUP_VERSION}.Final/windup-cli-${WINDUP_VERSION}.Final-offline.zip
+#gunzip windup-cli-${WINDUP_VERSION}.Final-offline.zip
+
+git clone https://github.com/windup/windup
 
 DISTRIBUTION_DIR=dist
 mkdir $DISTRIBUTION_DIR
