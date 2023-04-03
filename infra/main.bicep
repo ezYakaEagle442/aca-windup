@@ -35,9 +35,6 @@ param containerRegistryName string = ''
 param logAnalyticsName string = ''
 param resourceGroupName string = ''
 
-
-param DB_DATABASE string = 'windup'
-
 @description('The PostgreSQL DB Admin Login. IMPORTANT: username can not start with prefix "pg_" which is reserved, ex: pg_adm would fails in Bicep. Admin login name cannot be azure_superuser, azuresu, azure_pg_admin, sa, admin, administrator, root, guest, dbmanager, loginmanager, dbo, information_schema, sys, db_accessadmin, db_backupoperator, db_datareader, db_datawriter, db_ddladmin, db_denydatareader, db_denydatawriter, db_owner, db_securityadmin, public')
 param administratorLogin string = 'pgs_adm'
 
@@ -89,7 +86,8 @@ module containerApps './core/host/container-apps.bicep' = {
   name: 'container-apps'
   scope: rg
   params: {
-    name: 'app'
+    name: 'windup'
+    tags: tags
     containerAppsEnvironmentName: !empty(containerAppsEnvironmentName) ? containerAppsEnvironmentName : '${abbrs.appManagedEnvironments}${resourceToken}'
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     location: location
@@ -106,10 +104,13 @@ output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.container
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
 
+
 module uiApp './app/ui.bicep' = {
-  name: 'ui-app'
+  name: 'ui-app' // '${abbrs.appContainerApps}-ui-app'
   scope: rg
   params: {
+    imageName: 'quay.io/windupeng/windup-web-openshift:latest'
+    tags: tags
     pgServerName: !empty(pgServerName) ? pgServerName : '${abbrs.dBforPostgreSQLServers}${resourceToken}'
     containerAppsEnvironmentName: containerApps.outputs.containerAppsEnvironmentName
     containerRegistryName: containerApps.outputs.registryName
@@ -117,7 +118,7 @@ module uiApp './app/ui.bicep' = {
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     DB_PASSWORD: administratorLoginPassword
     DB_USERNAME: administratorLogin
-    DB_DATABASE: DB_DATABASE
+    DB_DATABASE: dbName
     GENERIC_WEBHOOK_SECRET: 'foo'
     GITHUB_WEBHOOK_SECRET: 'foo'
     JGROUPS_CLUSTER_PASSWORD: administratorLoginPassword
@@ -138,7 +139,7 @@ module acrAccess './core/security/registry-access.bicep' = {
   scope: rg
   params: {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
-    principalId: uiApp.outputs.identityPrincipalId
+    principalId: uiApp.outputs.UI_IDENTITY_PRINCIPAL_ID
   }
   dependsOn: [
     containerApps
@@ -152,7 +153,7 @@ module hello './core/host/aca-hello.bicep' = {
   params: {
     location: location
     tags: union(tags, { 'azd-service-name': 'hello' })
-    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentName: containerApps.outputs.containerAppsEnvironmentName
   }
   dependsOn: [
     containerApps
