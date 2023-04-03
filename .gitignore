@@ -61,5 +61,4 @@ nn-bindings/reddog-sandbox
 
 prv/*
 deploy/*
-cnf/*
 dist/*
