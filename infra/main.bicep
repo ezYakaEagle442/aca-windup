@@ -35,6 +35,9 @@ param containerRegistryName string = ''
 param logAnalyticsName string = ''
 param resourceGroupName string = ''
 
+
+param DB_DATABASE string = 'windup'
+
 @description('The PostgreSQL DB Admin Login. IMPORTANT: username can not start with prefix "pg_" which is reserved, ex: pg_adm would fails in Bicep. Admin login name cannot be azure_superuser, azuresu, azure_pg_admin, sa, admin, administrator, root, guest, dbmanager, loginmanager, dbo, information_schema, sys, db_accessadmin, db_backupoperator, db_datareader, db_datawriter, db_ddladmin, db_denydatareader, db_denydatawriter, db_owner, db_securityadmin, public')
 param administratorLogin string = 'pgs_adm'
 
@@ -103,6 +106,45 @@ output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.container
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
 
+module uiApp './app/ui.bicep' = {
+  name: 'ui-app'
+  scope: rg
+  params: {
+    pgServerName: !empty(pgServerName) ? pgServerName : '${abbrs.dBforPostgreSQLServers}${resourceToken}'
+    containerAppsEnvironmentName: containerApps.outputs.containerAppsEnvironmentName
+    containerRegistryName: containerApps.outputs.registryName
+    location: location
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    DB_PASSWORD: administratorLoginPassword
+    DB_USERNAME: administratorLogin
+    DB_DATABASE: DB_DATABASE
+    GENERIC_WEBHOOK_SECRET: 'foo'
+    GITHUB_WEBHOOK_SECRET: 'foo'
+    JGROUPS_CLUSTER_PASSWORD: administratorLoginPassword
+    JGROUPS_ENCRYPT_PASSWORD: administratorLoginPassword
+    MQ_CLUSTER_PASSWORD: administratorLoginPassword
+    SSO_SAML_KEYSTORE_PASSWORD: administratorLoginPassword
+    SSO_TRUSTSTORE_PASSWORD: administratorLoginPassword
+    SSO_SECRET: administratorLoginPassword
+  }
+  dependsOn: [
+    containerApps
+    db
+  ]  
+}
+
+module acrAccess './core/security/registry-access.bicep' = {
+  name: 'registry-access'
+  scope: rg
+  params: {
+    containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
+    principalId: uiApp.outputs.identityPrincipalId
+  }
+  dependsOn: [
+    containerApps
+    uiApp
+  ]  
+}
 
 module hello './core/host/aca-hello.bicep' = {
   name: 'hello-app'
