@@ -93,7 +93,7 @@ param DOCKER_IMAGES_USER string = ''
 param DOCKER_IMAGES_TAG string = 'latest'
 
 @description('The maximum value of the size the an HTTP post request')
-param MAX_POST_SIZE int = 4294967296
+param MAX_POST_SIZE int = 4294967296 // 4294967296 = 4 TB | 4194304=4Gb
 
 // ################ below params are optional ########
 
@@ -294,7 +294,7 @@ var env = [
   }
   {
     name: 'WINDUP_WEB_CONSOLE_POSTGRESQL_SERVICE_PORT'
-    value: WINDUP_WEB_CONSOLE_POSTGRESQL_SERVICE_PORT
+    value: string(WINDUP_WEB_CONSOLE_POSTGRESQL_SERVICE_PORT)
   }
   {
       name: 'DB_DATABASE'
@@ -450,7 +450,7 @@ var env = [
   }
   {
       name: 'MAX_POST_SIZE'
-      value: 'MAX_POST_SIZE'
+      value: string(MAX_POST_SIZE)
   }
   {
       name: 'SSO_FORCE_LEGACY_SECURITY'
