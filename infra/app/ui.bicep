@@ -24,7 +24,7 @@ az deployment group create --name test-ui-module -f ./infra/app/ui.bicep -g rg-a
 
 param location string = resourceGroup().location
 param tags object = {}
-param name string
+param pgServerName string
 
 param applicationInsightsName string
 param containerAppsEnvironmentName string
@@ -198,7 +198,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 }
 
 resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' existing = {
-    name: name
+    name: pgServerName
 }
 
 resource postgreSQLDB 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2022-12-01' existing =  {
