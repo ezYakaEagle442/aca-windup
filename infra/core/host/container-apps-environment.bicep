@@ -62,7 +62,7 @@ resource acastorage 'Microsoft.App/managedEnvironments/storages@2022-10-01' = {
   properties: {
     azureFile: {
       accessMode: 'ReadWrite'
-      accountKey: azurestorage.listAccountSas().accountSasToken
+      accountKey: azurestorage.listKeys().keys[0].value
       accountName: azureStorageName
       shareName: azureFileShareServiceName
     }
