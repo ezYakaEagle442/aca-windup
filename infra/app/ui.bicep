@@ -46,6 +46,8 @@ param applicationInsightsConfigFile string = 'applicationinsights.json'
 
 // Windup params: https://github.com/windup/windup-openshift/blob/master/templates/src/main/resources/web-template-empty-dir-executor.json#L734
 
+param OPENSHIFT_KUBE_PING_NAMESPACE string = 'k8se-apps'
+
 @description('The name of the application.')
 param APPLICATION_NAME string = 'windup-web-console'
 
@@ -322,7 +324,7 @@ var env = [
   }
   {
       name: 'OPENSHIFT_KUBE_PING_NAMESPACE'
-      value: ''
+      value: OPENSHIFT_KUBE_PING_NAMESPACE
   }
   {
       name: 'HTTPS_KEYSTORE_DIR'
