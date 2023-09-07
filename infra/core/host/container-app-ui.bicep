@@ -26,6 +26,16 @@ param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
 
 param containerName string = 'windup-ui'
+
+@description('The Storage Account name')
+param azureStorageName string = ''
+
+@description('The Azure Files Share mount path')
+param mountPath string = '/winshare' 
+
+@description('The Azure Files Share volume Name')
+param volumeName string = 'winvol' 
+
 param external bool = true
 param imageName string = 'quay.io/windupeng/windup-web-openshift:latest'
 param managedIdentity bool = true
@@ -99,6 +109,12 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
           image: imageName
           name: containerName
           env: env
+          volumeMounts: [
+            {
+              mountPath: mountPath
+              volumeName: volumeName
+            }
+          ]          
           /*
           https://learn.microsoft.com/en-us/azure/container-apps/health-probes?tabs=arm-template#restrictions
           exec probes aren't supported.: https://github.com/microsoft/azure-container-apps/issues/461
@@ -153,6 +169,13 @@ resource app 'Microsoft.App/containerApps@2022-10-01' = {
             cpu: any(containerCpuCoreCount)
             memory: containerMemory
           }
+        }        
+      ]
+      volumes: [
+        {
+          name: volumeName
+          storageName: azureStorageName
+          storageType: 'AzureFile'
         }
       ]
       scale: {

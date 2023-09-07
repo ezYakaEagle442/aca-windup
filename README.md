@@ -70,7 +70,7 @@ UNIQUEID=$(openssl rand -hex 3)
 
 export AZURE_ENV_NAME=windup42
 export AZURE_LOCATION=westeurope
-export RESOURCE_GROUP_NAME=rg-aca-windup
+export AZURE_RESOURCE_GROUP=rg-aca-windup
 # export AZURE_STORAGE_NAME="sta""${UNIQUEID,,}"
 # unset AZURE_STORAGE_NAME
 export AZURE_FILE_SHARE_SERVICE_NAME=windup

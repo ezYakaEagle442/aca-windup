@@ -49,6 +49,44 @@ xdg-settings set default-web-browser edge.desktop
 # BROWSER=/mnt/c/Windows/SystemApps/Microsoft.MicrosoftEdge_8wekyb3d8bbwe
 ```
 
+Install Docker
+```sh
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    software-properties-common
+
+# Download and add Docker's official public PGP key.
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Verify the fingerprint.
+sudo apt-key fingerprint 0EBFCD88
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io --yes
+apt-cache madison docker-ce
+
+sudo apt update
+sudo apt upgrade
+# sudo apt install docker.io
+sudo docker --version
+
+# sudo cgroupfs-mount
+# sudo usermod -aG docker $USER
+
+# https://askubuntu.com/questions/1380051/docker-unrecognized-service-when-installing-cuda
+service --status-all
+sudo service docker start
+sudo service docker status
+```
 
 ```sh
 UNIQUEID=$(openssl rand -hex 3)

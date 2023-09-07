@@ -32,6 +32,15 @@ param containerRegistryName string
 param imageName string = 'quay.io/windupeng/windup-web-openshift:latest'
 param serviceName string = 'ui'
 
+@description('The Storage Account name')
+param azureStorageName string = ''
+
+@description('The Azure Files Share mount path')
+param mountPath string = '/winshare' 
+
+@description('The Azure Files Share volume Name')
+param volumeName string = 'winvol' 
+
 @allowed([
   8042
   8080
@@ -471,6 +480,9 @@ module ui '../core/host/container-app-ui.bicep' = {
     env: env
     secrets: secrets
     imageName: !empty(imageName) ? imageName : 'nginx:latest'
+    volumeName: volumeName
+    mountPath: mountPath
+    azureStorageName: azureStorageName
     targetPort: appPort
   }
 }

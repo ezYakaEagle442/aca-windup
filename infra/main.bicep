@@ -20,6 +20,12 @@ param location string
 @description('The Storage Account name')
 param azureStorageName string = ''
 
+@description('The Azure Files Share mount path')
+param mountPath string = '/winshare' 
+
+@description('The Azure Files Share volume Name')
+param volumeName string = 'winvol' 
+
 @description('The Azure Files Share service service name')
 param azureFileShareServiceName string = ''
 
@@ -103,6 +109,7 @@ module containerApps './core/host/container-apps.bicep' = {
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.containerAppsEnvironmentName
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
+output ACA_STORAGE_NAME string = containerApps.outputs.containerAppsEnvironmentStorageName
 
 
 module uiApp './app/ui.bicep' = {
@@ -113,6 +120,9 @@ module uiApp './app/ui.bicep' = {
     tags: tags
     pgServerName: !empty(pgServerName) ? pgServerName : '${abbrs.dBforPostgreSQLServers}${resourceToken}'
     containerAppsEnvironmentName: containerApps.outputs.containerAppsEnvironmentName
+    volumeName: volumeName
+    mountPath: mountPath
+    azureStorageName: containerApps.outputs.containerAppsEnvironmentStorageName // !empty(azureFileShareServiceName) ? azureFileShareServiceName : '${resourceToken}' 
     containerRegistryName: containerApps.outputs.registryName
     location: location
     applicationInsightsName: monitoring.outputs.applicationInsightsName

@@ -61,7 +61,7 @@ param databaseSkuTier string = 'Burstable'
   '12'
   '11'
 ])
-param version string = '14' // https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-supported-versions
+param version string = '11' // https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-supported-versions
 
 // Latest official version 2022-12-01 does not have Bicep types available
 resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' = {

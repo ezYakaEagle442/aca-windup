@@ -29,7 +29,8 @@ output containerAppsEnvironmentName string = containerAppsEnvironment.outputs.co
 output containerAppsEnvironmentId string = containerAppsEnvironment.outputs.containerAppsEnvironmentId
 output containerAppsEnvironmentDefaultDomain string = containerAppsEnvironment.outputs.containerAppsEnvironmentDefaultDomain
 output containerAppsEnvironmentStaticIp string = containerAppsEnvironment.outputs.containerAppsEnvironmentStaticIp
-
+output containerAppsEnvironmentStorageId string = containerAppsEnvironment.outputs.acaStorageId
+output containerAppsEnvironmentStorageName string = containerAppsEnvironment.outputs.acaStorageName
 
 module containerRegistry 'container-registry.bicep' = {
   name: '${name}-container-registry'
